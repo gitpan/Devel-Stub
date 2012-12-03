@@ -1,11 +1,12 @@
 NAME
     Devel::Stub - stub some methods for development purpose
 
-TYPICAL USAGE
-    When you develop a webapp,you'd like to develop views and/or controllers
-    using stubbed model modules which can return expected data.
+DESCRIPTION
+    For example, when you develop a webapp,you'd like to develop views
+    and/or controllers using stubbed model modules which can return expected
+    data. This module helps it.
 
-    * With this module,you can stub some method on exisiting moudle
+    * With this module,you can stub some methods on exisiting moudle
 
     * This module adds a lib path on initializing the app (when invoked with
       specific environment variable) so that you can organize stub file on
@@ -16,7 +17,7 @@ TYPICAL USAGE
       existing modules.
 
 SYNOPSIS
-    The step is: 1) declare Devel::Stub::lib on main applicaton file. 2)
+    The step is; 1) declare Devel::Stub::lib on main applicaton file. 2)
     Overide methods with module which has same pacakge of original one.
 
   Devel::Stub::lib
@@ -127,8 +128,6 @@ WRITING STUBS
          +{ stubbed => "data"};
       };
 
-      1;
-
   INVOKE ORIGINAL METHOD
     you can invoke original method with "_orginal()".
 
@@ -139,6 +138,26 @@ WRITING STUBS
        }  
        ["stubbed","data","is","here"];
      };
+
+  TAG option
+    Opionaly,if you specify "TAG" parameter with stub method. That won't be
+    activated unless you exec app with STUB_TAG environment.
+
+      stub foo => sub {
+        "stubbed!";
+      },TAG => ["devel","local"];
+
+      stub 
+        TAG => ["staging"],
+        moo => sub  {
+          "stubbed!";
+        };
+
+    with stub file above,
+
+      STUB=1 STUB_TAG=local perl app.pl  # 'foo' is stubbed
+      STUB=1 STUB_TAG=staging perl app.pl # 'moo' is stubbed.
+      STUB=1 perl app.pl # neither is stubbed.
 
 AUTHOR
     Masaki Sawamura <sawamur@cpan.org>

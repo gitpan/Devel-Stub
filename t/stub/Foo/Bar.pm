@@ -16,7 +16,19 @@ stub poo => sub {
     "stubed!";
 };
 
+stub TAG => ["moge"],too => sub {
+    "xxxx";
+};
 
+stub 
+    TAG => ["tag","devel","foo"],
+    too => sub {
+        "tagged";
+};
+
+stub qoo => sub {
+    "tagged";
+}, TAG => "staging";
 
 
 1;

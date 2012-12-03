@@ -4,13 +4,20 @@ use warnings;
 use Module::Load;
 use Sub::Name qw/subname/;
 use version;
-our $VERSION = qv('0.01');
+our $VERSION = qv('0.02');
 
 sub stub {
-    my ($name,$code) = @_;
+    my %params = @_;
+    my @tags;
+    if ($params{TAG}){
+      @tags = ref($params{TAG}) ? @{$params{TAG}} : ($params{TAG});
+      delete $params{TAG};
+      return unless $ENV{STUB_TAG};
+      return unless grep { $_ eq $ENV{STUB_TAG}} @tags;
+    }
+    my ($name,$code) = %params;
     no strict 'refs';
     no warnings 'redefine';
-    
     my ($pkg,$file,$line) = caller;
     my $original = \&{"${pkg}::${name}"};
     *{"${pkg}::__original_${name}"} = $original;
@@ -48,15 +55,15 @@ __END__
 
 Devel::Stub - stub some methods for development purpose
 
-=head1 TYPICAL USAGE
+=head1 DESCRIPTION
 
-When you develop a webapp,you'd like to  develop views and/or
+For example, when you develop a webapp,you'd like to  develop views and/or
 controllers using stubbed model modules which can return expected data.
-
+This module helps it.
 
 =over 2
 
-=item * With this module,you can stub some method on exisiting moudle 
+=item * With this module,you can stub some methods on exisiting moudle 
 
 =item * This module adds a lib path on initializing the app (when invoked with specific environment variable) so that you can organize stub file on the path outside of main lib path
 
@@ -67,7 +74,7 @@ controllers using stubbed model modules which can return expected data.
 
 =head1 SYNOPSIS
 
-The step is:
+The step is; 
 1) declare Devel::Stub::lib on main applicaton file. 2) Overide methods with module which has same pacakge of original one.
 
 
@@ -210,7 +217,6 @@ you can define stubs with C<stub> method.
      +{ stubbed => "data"};
   };
 
-  1;
 
 =head2 INVOKE ORIGINAL METHOD
 
@@ -223,6 +229,28 @@ you can invoke original method with C<_orginal()>.
    }  
    ["stubbed","data","is","here"];
  };
+
+
+=head2 TAG option
+
+Opionaly,if you specify C<TAG> parameter with stub method.
+That won't be activated unless you exec app with STUB_TAG environment.
+ 
+  stub foo => sub {
+    "stubbed!";
+  },TAG => ["devel","local"];
+
+  stub 
+    TAG => ["staging"],
+    moo => sub  {
+      "stubbed!";
+    };
+
+with stub file above,
+
+  STUB=1 STUB_TAG=local perl app.pl  # 'foo' is stubbed
+  STUB=1 STUB_TAG=staging perl app.pl # 'moo' is stubbed.
+  STUB=1 perl app.pl # neither is stubbed.
 
 
 =head1 AUTHOR

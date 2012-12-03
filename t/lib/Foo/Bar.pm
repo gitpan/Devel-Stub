@@ -19,5 +19,12 @@ sub poo {
   "original!";
 }
 
+sub too {
+    "too";
+}
+
+sub qoo {
+    "qoo";
+}
 
 1;
